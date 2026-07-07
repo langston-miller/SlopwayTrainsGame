@@ -4,11 +4,11 @@ Last Updated: July 7th, 2026
 
 ## About
 
-This is totally normal game where you dodge trains and red spheres. 
+This is a game where you dodge trains and red spheres on rails.
 
 ## How to Play
 ### Player 1
-* Move: A/D
+* **Move**: A/D
 * **Use Item:** Q
 
 ### Player 2
@@ -16,7 +16,7 @@ This is totally normal game where you dodge trains and red spheres.
 * **Use Item:** U
 
 ## Other Features
-1. Local Saving
+1. Save Data
 2. Gamepad Support
 3. 2-Player Versus Mode
 
