@@ -1,85 +1,85 @@
-
-// Game Logic parameters
-let scene, camera, renderer;
-let p1Mesh, p2Mesh;
-let p1Lane = 1; 
-let p2Lane = 1; 
-const laneXPositions = [-3, 0, 3];
+(function() {
+        // Game Logic parameters
+        let scene, camera, renderer;
+        let p1Mesh, p2Mesh;
+        let p1Lane = 1; 
+        let p2Lane = 1; 
+        const laneXPositions = [-3, 0, 3];
         
-let obstacles = [];
-let score = 0;
-let sessionCoins = 0; 
-let gameActive = false;
-let isJumpscareActive = false;
-let isHugActive = false;
-let hugSphere = null;
-let hugTimer = 0;
-let menuState = "TITLE";
+        let obstacles = []; 
+        let score = 0;
+        let sessionCoins = 0; 
+        let gameActive = false;
+        let isJumpscareActive = false;
+        let isHugActive = false;
+        let hugSphere = null;
+        let hugTimer = 0;
+        let menuState = "TITLE"; // TITLE, MODE_SELECT, COUNTDOWN, PLAYING, GAMEOVER, SHOP, SETTINGS, HUGGING
+        
+        let playerMode = 1; // 1 = 1P, 2 = 2P Mode
+        let p1Dead = false;
+        let p2Dead = false;
+        let countdownCount = 3;
+        let countdownTimer = 0;
 
-let playerMode = 1;
-let p1Dead = false;
-let p2Dead = false;
-let countdownCount = 3;
-let countdownTimer = 0;
+        // Interactive items in 2P Mode
+        let p1Item = null; // invincibility, wipe, coin_rush, freeze, reverse, slow, sabotage
+        let p2Item = null;
+        let p1InvincibilityTimer = 0;
+        let p2InvincibilityTimer = 0;
+        let p1FreezeTimer = 0;
+        let p2FreezeTimer = 0;
+        let p1ReverseTimer = 0;
+        let p2ReverseTimer = 0;
+        let p1SlowTimer = 0;
+        let p2SlowTimer = 0;
+        let coinRushTimer = 0;
+        let sabotageRushTimer = 0;
 
-// Interactive items in 2P Mode
-let p1Item = null; // invincibility, wipe, coin_rush, freeze, reverse, slow, sabotage
-let p2Item = null;
-let p1InvincibilityTimer = 0;
-let p2InvincibilityTimer = 0;
-let p1FreezeTimer = 0;
-let p2FreezeTimer = 0;
-let p1ReverseTimer = 0;
-let p2ReverseTimer = 0;
-let p1SlowTimer = 0;
-let p2SlowTimer = 0;
-let coinRushTimer = 0;
-let sabotageRushTimer = 0;
+        let p1ShieldVisual, p2ShieldVisual;
+        let p1FreezeVisual, p2FreezeVisual;
+        let tearParticles = [];
 
-let p1ShieldVisual, p2ShieldVisual;
-let p1FreezeVisual, p2FreezeVisual;
-let tearParticles = [];
+        const baseSpeed = 0.5;
+        let currentSpeed = 0.5;
+        let spawnTimer = 0;
+        let deathCause = 'train'; // 'train', 'jumpscare', 'hug', 'p1_death', 'p2_death'
+        let winnerNum = 0; // for 2P VS Mode ending
 
-const baseSpeed = 0.5;
-let currentSpeed = 0.5;
-let spawnTimer = 0;
-let deathCause = 'train'; // 'train', 'jumpscare', 'hug', 'p1_death', 'p2_death'
-let winnerNum = 0; // for 2P VS Mode ending
+        // Audio synthesizer parameters
+        let volumeLevel = localStorage.getItem('slop_volume') || 'high'; // high, medium, low, mute
 
-// Audio synthesizer parameters
-let volumeLevel = localStorage.getItem('slop_volume') || 'high'; // high, medium, low, mute
+        // Controller axis threshold debounce
+        let p1GamepadAxisFlipped = false;
+        let p2GamepadAxisFlipped = false;
 
-// Controller axis threshold debounce
-let p1GamepadAxisFlipped = false;
-let p2GamepadAxisFlipped = false;
-
-// Save Profiles
-let wallet = parseInt(localStorage.getItem('slop_coins')) || 0;
-let highScore = parseInt(localStorage.getItem('slop_highscore')) || 0;
-let unlockedSkins = JSON.parse(localStorage.getItem('slop_skins')) || { red: false, gold: false, emerald: false, obsidian: false, cyber: false };
-let activeSkin = localStorage.getItem('slop_activeskin') || 'grey';
-let jumpscaresEnabled = localStorage.getItem('slop_jumpscares') !== 'false';
+        // Save Profiles
+        let wallet = parseInt(localStorage.getItem('slop_coins')) || 0;
+        let highScore = parseInt(localStorage.getItem('slop_highscore')) || 0;
+        let unlockedSkins = JSON.parse(localStorage.getItem('slop_skins')) || { red: false, gold: false, emerald: false, obsidian: false, cyber: false };
+        let activeSkin = localStorage.getItem('slop_activeskin') || 'grey';
+        let jumpscaresEnabled = localStorage.getItem('slop_jumpscares') !== 'false';
 
         // Available Skins Schema
-const skinInventory = [
-    { id: 'grey', name: 'Default Grey', color: 0x777777, cost: 0 },
-    { id: 'red', name: 'Blood Tint', color: 0x990000, cost: 5 },
-    { id: 'emerald', name: 'Emerald', color: 0x00cc66, cost: 10 },
-    { id: 'gold', name: 'Gold Player', color: 0xffd700, cost: 15 },
-    { id: 'obsidian', name: 'Obsidian Glow', color: 0x330066, cost: 25 },
-    { id: 'cyber', name: 'Neon Cyber', color: 0x00ffff, cost: 30 }
-];
+        const skinInventory = [
+            { id: 'grey', name: 'Default Grey', color: 0x777777, cost: 0 },
+            { id: 'red', name: 'Blood Tint', color: 0x990000, cost: 5 },
+            { id: 'emerald', name: 'Emerald', color: 0x00cc66, cost: 10 },
+            { id: 'gold', name: 'Gold Player', color: 0xffd700, cost: 15 },
+            { id: 'obsidian', name: 'Obsidian Glow', color: 0x330066, cost: 25 },
+            { id: 'cyber', name: 'Neon Cyber', color: 0x00ffff, cost: 30 }
+        ];
 
-// Available items database
-const itemsList = [
-    { id: 'invincibility', name: 'Invincibility', desc: 'Ignore hazards' },
-    { id: 'wipe', name: 'Screen Wipe', desc: 'Clear paths' },
-    { id: 'coin_rush', name: 'Coin Rush', desc: 'Convert hazards to coins' },
-    { id: 'freeze', name: 'Ice Freeze', desc: 'Freeze opponent lanes' },
-    { id: 'reverse', name: 'Reverser', desc: 'Reverse opponent controls' },
-    { id: 'slow', name: 'Slowdown', desc: 'Suck opponent speed' },
-    { id: 'sabotage', name: 'Sabotage', desc: 'Convert coins to spheres' }
-];
+        // Available items database
+        const itemsList = [
+            { id: 'invincibility', name: 'Invincibility', desc: 'Ignore hazards' },
+            { id: 'wipe', name: 'Screen Wipe', desc: 'Clear paths' },
+            { id: 'coin_rush', name: 'Coin Rush', desc: 'Convert hazards to coins' },
+            { id: 'freeze', name: 'Ice Freeze', desc: 'Freeze opponent lanes' },
+            { id: 'reverse', name: 'Reverser', desc: 'Reverse opponent controls' },
+            { id: 'slow', name: 'Slowdown', desc: 'Suck opponent speed' },
+            { id: 'sabotage', name: 'Sabotage', desc: 'Convert coins to spheres' }
+        ];
         
         const container = document.getElementById('canvas-container');
         const uiScore = document.getElementById('game-ui');
@@ -257,10 +257,17 @@ const itemsList = [
         }
 
         function toggleVolume() {
-            if (volumeLevel === 'high') volumeLevel = 'medium';
-            else if (volumeLevel === 'medium') volumeLevel = 'low';
-            else if (volumeLevel === 'low') volumeLevel = 'mute';
-            else volumeLevel = 'high';
+            switch (volumeLevel) {
+                case "high":
+                    volumeLevel = "medium";
+                case "medium":
+                    volumeLevel = "low";
+                case "low":
+                    volumeLevel = "mute";
+                default:
+                    volumeLevel = "high";
+            }
+
             localStorage.setItem('slop_volume', volumeLevel);
             updateVolumeButtonText();
         }
@@ -420,7 +427,7 @@ const itemsList = [
                     playSound(440, 0.2, 'sine');
                 } else if (countdownCount === 0) {
                     countdownText.innerText = "GO!";
-                    playSound(880, 0.4, 'sine'); // High pitch beep
+                    playSound(880, 0.4, 'sine');
                 } else {
                     countdownScreen.style.display = 'none';
                     startGame();
@@ -1003,8 +1010,8 @@ const itemsList = [
         window.addEventListener('keydown', (e) => {
             const key = e.key.toLowerCase();
             if (gameActive) {
-                // Player 1 controls (A / W to move Left, D to move Right)
-                let p1MoveLeft = (key === 'a' || key === 'w');
+                // Player 1 controls (A to move Left, D to move Right)
+                let p1MoveLeft = (key === 'a');
                 let p1MoveRight = (key === 'd');
 
                 if (p1ReverseTimer > 0) {
@@ -1072,3 +1079,4 @@ const itemsList = [
 
         init3D();
         animate();
+    })();  
