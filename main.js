@@ -103,10 +103,16 @@
 
         // Helper to check volume multipliers
         function getVolumeMultiplier() {
-            if (volumeLevel === 'medium') return 0.5;
-            if (volumeLevel === 'low') return 0.15;
-            if (volumeLevel === 'mute') return 0.0;
-            return 1.0;
+            switch (volumeLevel) {
+                case "medium":
+                    return 0.5;
+                case "low":
+                    return 0.15;
+                case "mute":
+                    return 0;
+                default:
+                    return 1;
+            }
         }
 
         function playSound(freq, duration, type = 'sine', slideTo = null) {

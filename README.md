@@ -1,28 +1,32 @@
 # Slopway Trains
 ![A title screen for a videogame.](media/menu.png)
-Last Updated: July 15th, 2026
+
+Last Updated: August 19th, 2026
 
 ## About
-This is a game where you dodge trains and red spheres on rails. Make sure to collect coins and survive for as long as you can.
+This is a game where you dodge trains and red spheres on rails. 
 
-## How to Play
+The goal of this game is collect coins and survive for as long as you can.
+
+## Controls
 ### Player 1
-* **Move**: A/D
-* **Use Item:** Q
+* **Move**: A/D (Keyboard), D-Pad Left/Right (Controller)
+* **Use Item (2P Mode Only):** Q
 
 ### Player 2
 * **Move:** J/L
-* **Use Item:** U
+* **Use Item (2P Mode Only):** U
 
 ## Other Features
-1. Save Data
-2. Gamepad Support
-3. 2-Player Versus Mode
+* Save Data
+* Gamepad Support
+* Player Cosmetics
+* 2-Player Versus Mode
 
 ## Disclaimers
 This game contains flashing lights and jumpscares. These features can be disabled in the settings.
 
-If you are using a gamepad, you may still need to use a keyboard and mouse in some menus.
+If you are using a gamepad, you will need to use a keyboard and mouse in some menus.
 
 ## Media
 ![An videogame screenshot featuring a grey cube on rails.](media/1Pgame_img1.png)
