@@ -100,6 +100,7 @@
         const shopBalance = document.getElementById('shop-balance');
         const jumpscareScreen = document.getElementById('jumpscare-screen');
         const settingsScreen = document.getElementById('settings-screen');
+        const v2screen = document.getElementById('v2-screen');
 
         // Helper to check volume multipliers
         function getVolumeMultiplier() {
@@ -288,6 +289,7 @@
             gameOverScreen.style.display = 'none'; 
             shopScreen.style.display = 'none'; 
             settingsScreen.style.display = 'none'; 
+            v2screen.style.display = 'none';
             modeSelectScreen.style.display = 'none';
             countdownScreen.style.display = 'none';
             uiScore.style.display = 'none';
@@ -301,6 +303,10 @@
 
         function openSettings() {
             menuState = "SETTINGS"; titleScreen.style.display = 'none'; settingsScreen.style.display = 'flex';
+        }
+
+        function openV2Info() {
+            menuState = "V2-INFO"; titleScreen.style.display = 'none'; v2screen.style.display = 'flex';
         }
 
         function showModeSelect() {
@@ -470,6 +476,7 @@
                 p1Mesh.position.x = laneXPositions[p1Lane];
                 p1Mesh.position.z = 0;
                 p1Mesh.position.y = 0.6;
+                p1Mesh.rotation.set(0, 0, 0);
                 uiScore.style.display = 'block';
                 hud2p.style.display = 'none';
                 updateUIScore();
@@ -670,8 +677,8 @@
             } 
             else if (item.id === 'freeze') {
                 // freeze opponent
-                if (playerNum === 1) { p2FreezeTimer = 3.0; p2FreezeVisual.visible = true; }
-                else { p1FreezeTimer = 3.0; p1FreezeVisual.visible = true; }
+                if (playerNum === 1) { p2FreezeTimer = 2.0; p2FreezeVisual.visible = true; }
+                else { p1FreezeTimer = 2.0; p1FreezeVisual.visible = true; }
             } 
             else if (item.id === 'reverse') {
                 // reverse opponent controls
@@ -703,7 +710,7 @@
         }
 
         function spawnTear(x, y, z) {
-            const tearGeo = new THREE.SphereGeometry(0.12, 8, 8);
+            const tearGeo = new THREE.SphereGeometry(0.12, 0.12, 0.12);
             const tearMat = new THREE.MeshBasicMaterial({ color: 0x3399ff, transparent: true, opacity: 0.7 });
             const mesh = new THREE.Mesh(tearGeo, tearMat);
             mesh.position.set(x + (Math.random() - 0.5) * 0.4, y + 0.3, z);
@@ -962,6 +969,8 @@
                     triggerGameOver(false, 'hug');
                 }
             } else if (menuState === "COUNTDOWN") {
+                p1Mesh.rotation.y = 0;
+                p2Mesh.rotation.y = 0;
                 runCountdown(dt);
             } else if (menuState === "GAMEOVER" && playerMode === 2) {
                 // End screen animation
@@ -971,21 +980,31 @@
                 if (winnerNum === 1) {
                     // P1 Wins - Jump up and down
                     p1Mesh.position.y = 0.6 + Math.abs(Math.sin(time * 10)) * 1.5;
+                    
+                    // P2 Loses - Nod Left and Right
+                    p2Mesh.rotation.y = (Math.PI / 2) + ((Math.sin(time * 5)) * (Math.PI / 4));
+                    p2Mesh.position.y = 0.6;
+                    /*
                     // P2 Loses - Roll over and cry tears
                     p2Mesh.rotation.z = Math.PI / 2;
                     p2Mesh.position.y = 0.6;
-                    if (Math.random() < 0.15) {
-                        spawnTear(p2Mesh.position.x, p2Mesh.position.y, p2Mesh.position.z);
-                    }
+                    if (Math.random() < 0.5) {
+                        //spawnTear(p2Mesh.position.x, p2Mesh.position.y, p2Mesh.position.z);
+                    }*/
                 } else if (winnerNum === 2) {
                     // P2 Wins - Jump up and down
                     p2Mesh.position.y = 0.6 + Math.abs(Math.sin(time * 10)) * 1.5;
+                    
+                    // P1 Loses - Nod Left and Right
+                    p1Mesh.rotation.y = (Math.PI / 2) + ((Math.sin(time * 5)) * (Math.PI / 4));
+                    p1Mesh.position.y = 0.6;
+                    /*
                     // P1 Loses - Roll over and cry tears
                     p1Mesh.rotation.z = Math.PI / 2;
                     p1Mesh.position.y = 0.6;
-                    if (Math.random() < 0.15) {
-                        spawnTear(p1Mesh.position.x, p1Mesh.position.y, p1Mesh.position.z);
-                    }
+                    if (Math.random() < 0.5) {
+                        //spawnTear(p1Mesh.position.x, p1Mesh.position.y, p1Mesh.position.z);
+                    }*/
                 }
             }
             renderer.render(scene, camera);
@@ -1003,11 +1022,13 @@
         
         // Settings Click Listeners
         document.getElementById('btn-settings-open').addEventListener('click', openSettings);
+        document.getElementById('btn-v2-open').addEventListener('click', openV2Info);
         document.getElementById('btn-close-settings').addEventListener('click', showTitleScreen);
         document.getElementById('btn-jumpscare-toggle').addEventListener('click', toggleJumpscares);
         document.getElementById('btn-volume-toggle').addEventListener('click', toggleVolume);
         document.getElementById('btn-reset-data').addEventListener('click', confirmWipeData);
-        
+        document.getElementById('btn-close-v2').addEventListener('click', showTitleScreen);
+
         // Modal Event Listeners
         document.getElementById('btn-modal-yes').addEventListener('click', executeWipeData);
         document.getElementById('btn-modal-no').addEventListener('click', closeWipeModal);
@@ -1064,7 +1085,7 @@
                     else if (e.key === 'Backspace') showTitleScreen();
                 } else if (menuState === "SHOP") {
                     if (e.key === 'Backspace') showTitleScreen();
-                } else if (menuState === "SETTINGS") {
+                } else if (menuState === "SETTINGS" || menuState === "V2-INFO") {
                     if (e.key === 'Backspace' || e.key === 'Escape') showTitleScreen();
                 } else if (menuState === "GAMEOVER") {
                     if (key === 'y' || e.key === ' ') selectMode(playerMode);

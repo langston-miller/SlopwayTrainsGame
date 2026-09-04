@@ -116,6 +116,17 @@
             background: #ff77cc;
             box-shadow: 0 6px 0 #b33680;
         }
+        
+        .btn-event {
+            background: #909941;
+            box-shadow: 0 4px 0 #6f7824;
+            color: #fff;
+        }
+
+        .btn-event:hover {
+            background: #a9b446;
+            box-shadow: 0 6px 0 #6f7824;
+        }
 
         .btn-danger {
             background: #ff4444;
@@ -180,7 +191,7 @@
         }
 
         #game-over-screen {
-            background: rgba(0, 0, 0, 0.92);
+            background: rgba(0, 0, 0, 0.52);
             display: none;
             font-size: 1.6rem;
             line-height: 1.6;
@@ -208,7 +219,7 @@
             box-shadow: 0 0 30px rgba(255, 85, 187, 0.2);
         }
 
-        #shop-screen, #settings-screen, #mode-select-screen, #countdown-screen {
+        #shop-screen, #settings-screen, #mode-select-screen, #countdown-screen, #v2-screen {
             display: none;
             background: rgba(5, 5, 5, 0.85);
         }
@@ -405,6 +416,8 @@
             <button class="btn" id="btn-start">Start Game [Space]</button>
             <button class="btn btn-secondary" id="btn-shop">Open Shop [S]</button>
             <button class="btn btn-secondary" id="btn-settings-open">Settings [O]</button>
+            <br>
+            <button class="btn btn-event" id="btn-v2-open">V2 Update</button>
         </div>
     </div>
 
@@ -461,6 +474,25 @@
             </div>
             
             <button class="btn btn-secondary" id="btn-close-settings">Return to Menu [Backspace]</button>
+        </div>
+    </div>
+
+    <!-- Version 2 Information -->
+     <div id="v2-screen" class="screen">
+        <div class="panel">
+            <h2 style="color: #00ffcc; font-size: 2.5rem; margin-bottom: 15px;">V2.0.0 Update</h2>
+            
+            <div style="padding: 10px;">
+                <p>Hello everyone! The V2.0.0 Update of this game is releasing soon. It should be done before March of 2027.<br>For now, please take a look at these images.</p>
+                
+                <div>
+                <img width="25%" src="media/v2_sneakpeak/title.png">
+                <img width="25%" src="media/v2_sneakpeak/2P_1.png">
+                </div>
+            </div>
+
+            
+            <button class="btn btn-secondary" id="btn-close-v2">Return to Menu [Backspace]</button>
         </div>
     </div>
 
